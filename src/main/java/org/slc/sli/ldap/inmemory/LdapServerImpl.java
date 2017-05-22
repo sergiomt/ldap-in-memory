@@ -208,9 +208,7 @@ public class LdapServerImpl {
             schema = Schema.getDefaultStandardSchema();
         } else {
             final String schemaName = configuration.getSchema().getName();
-            URL schemaUrl = this.getClass().getClassLoader().getResource(schemaName);
-            File schemaFile = new File(schemaUrl.toURI());
-            schema = Schema.getSchema(schemaFile);
+            schema = Schema.getSchema(getClass().getClassLoader().getResourceAsStream(schemaName));
         }
 
         final String rootObjectDN = configuration.getRoot().getObjectDn();

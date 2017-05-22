@@ -11,6 +11,8 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
+import javax.xml.transform.stream.StreamSource;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.net.URL;
@@ -34,7 +36,8 @@ public class ConfigurationLoader {
             throw new FileNotFoundException("The config schema file " + configSchemaFile + " was not found on the classpath.  This file should exist within the WAR.");
         }
 
-        Schema schema = sf.newSchema(new File(schemaUrl.toURI()));
+        Schema schema = sf.newSchema(new StreamSource(ConfigurationLoader.class.getClassLoader().getResourceAsStream(configSchemaFile)));
+
         JAXBContext context = JAXBContext.newInstance(Server.class);
         Unmarshaller unmarshaller = context.createUnmarshaller();
         unmarshaller.setSchema(schema);
@@ -44,9 +47,7 @@ public class ConfigurationLoader {
             throw new FileNotFoundException("The config file " + configFile + " was not found on the classpath.");
         }
 
-        File file = new File(configUrl.toURI());
-
-        Server server = (Server) unmarshaller.unmarshal(file);
+        Server server = (Server) unmarshaller.unmarshal(ConfigurationLoader.class.getClassLoader().getResourceAsStream(configFile));
 
         if (LOG.isDebugEnabled()) {
             LOG.debug(ToStringBuilder.reflectionToString(server, ToStringStyle.MULTI_LINE_STYLE));
